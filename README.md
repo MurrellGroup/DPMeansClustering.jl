@@ -18,7 +18,7 @@ Contains a variety of functions using dp based computation
 
 ## Installation
 ```julia
-Pkg.clone("DPMeansClustering")
+Pkg.clone("https://github.com/MurrellGroup/DPMeansClustering.jl.git")
 
 ```
 
