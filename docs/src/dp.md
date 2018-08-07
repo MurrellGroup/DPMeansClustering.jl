@@ -1,7 +1,7 @@
 # Clustering Functions
 
 ```@index
-dp.md
+Pages = ["dp.md"]
 ```
 
 ```@docs
