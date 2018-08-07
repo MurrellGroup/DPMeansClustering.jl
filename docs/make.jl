@@ -2,6 +2,9 @@
 # directory, then open index.md for docs
 
 using Documenter, DPMeansClustering
-
+    deps   = Deps.pip("mkdocs", "python-markdown-math"),
+    repo   = "github.com/MurrellGroup/DPMeansClustering.jl.git",
+    julia  = "nightly",
+    osname = "osx"
 makedocs()
 
