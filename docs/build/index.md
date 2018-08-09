@@ -8,6 +8,7 @@
 
 - [Clustering Functions](dp.md#Clustering-Functions-1)
 
+- [`DPMeansClustering.cluster`](dp.md#DPMeansClustering.cluster)
 - [`DPMeansClustering.dp_centers`](dp.md#DPMeansClustering.dp_centers)
 - [`DPMeansClustering.dp_means`](dp.md#DPMeansClustering.dp_means)
 

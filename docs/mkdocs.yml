@@ -3,7 +3,7 @@ repo_url:         https://github.com/MurrellGroup/DPMeansClustering.jl
 site_description: Contains a variety of functions using dp based computation
 site_author:      Ben Murrell
 
-theme: readthedocs
+theme: material
 
 extra_css:
   - assets/Documenter.css

@@ -3,6 +3,7 @@
 
 # Clustering Functions
 
+- [`DPMeansClustering.cluster`](dp.md#DPMeansClustering.cluster)
 - [`DPMeansClustering.dp_centers`](dp.md#DPMeansClustering.dp_centers)
 - [`DPMeansClustering.dp_means`](dp.md#DPMeansClustering.dp_means)
 
@@ -38,7 +39,7 @@ centroids == [1, 4]
 ```
 
 
-<a target='_blank' href='https://github.com/MurrellGroup/DPMeansClustering.jl/blob/c216c171c6de8d0a0d8db6dd197c02d996ab3aa2/src/dp.jl#L297-L325' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/MurrellGroup/DPMeansClustering.jl/blob/25d48980e173119cfda767725fe058da77c60d99/src/dp.jl#L297-L325' class='documenter-source'>source</a><br>
 
 <a id='DPMeansClustering.dp_centers' href='#DPMeansClustering.dp_centers'>#</a>
 **`DPMeansClustering.dp_centers`** &mdash; *Function*.
@@ -56,7 +57,7 @@ Returns (centroid_vectors, cluster_sizes, cluster_indices, centroid_indices) whe
 This is a generalization of `dp_means`.
 
 
-<a target='_blank' href='https://github.com/MurrellGroup/DPMeansClustering.jl/blob/c216c171c6de8d0a0d8db6dd197c02d996ab3aa2/src/dp.jl#L403-L416' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/MurrellGroup/DPMeansClustering.jl/blob/25d48980e173119cfda767725fe058da77c60d99/src/dp.jl#L403-L416' class='documenter-source'>source</a><br>
 
 
 ```
@@ -70,5 +71,20 @@ Returns (centroid_vectors, cluster_sizes, cluster_indices, centroid_indices) whe
 This is a recursive implementation of `dp_centers(inputs, radius)` for faster clustering.
 
 
-<a target='_blank' href='https://github.com/MurrellGroup/DPMeansClustering.jl/blob/c216c171c6de8d0a0d8db6dd197c02d996ab3aa2/src/dp.jl#L499-L513' class='documenter-source'>source</a><br>
+<a target='_blank' href='https://github.com/MurrellGroup/DPMeansClustering.jl/blob/25d48980e173119cfda767725fe058da77c60d99/src/dp.jl#L499-L513' class='documenter-source'>source</a><br>
+
+<a id='DPMeansClustering.cluster' href='#DPMeansClustering.cluster'>#</a>
+**`DPMeansClustering.cluster`** &mdash; *Function*.
+
+
+
+```
+cluster(inputs, radius::Float64; distfunc=euclidean, center=mean, verbose::Int64=1,
+            cycle_lim::Int64=30, triangle=false)
+```
+
+A wrapper that decides whether or not to use triangle inequality.
+
+
+<a target='_blank' href='https://github.com/MurrellGroup/DPMeansClustering.jl/blob/25d48980e173119cfda767725fe058da77c60d99/src/dp.jl#L2-L8' class='documenter-source'>source</a><br>
 
