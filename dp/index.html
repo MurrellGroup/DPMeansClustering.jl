@@ -299,6 +299,7 @@
                 <p><a id='Clustering-Functions-1'></a></p>
 <h1 id="clustering-functions">Clustering Functions</h1>
 <ul>
+<li><a href="./#DPMeansClustering.cluster"><code>DPMeansClustering.cluster</code></a></li>
 <li><a href="./#DPMeansClustering.dp_centers"><code>DPMeansClustering.dp_centers</code></a></li>
 <li><a href="./#DPMeansClustering.dp_means"><code>DPMeansClustering.dp_means</code></a></li>
 </ul>
@@ -325,7 +326,7 @@ indices == [[1, 2, 3], [4, 5, 6]]
 centroids == [1, 4]
 </code></pre>
 
-<p><a target='_blank' href='https://github.com/MurrellGroup/DPMeansClustering.jl/blob/c216c171c6de8d0a0d8db6dd197c02d996ab3aa2/src/dp.jl#L297-L325' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/MurrellGroup/DPMeansClustering.jl/blob/25d48980e173119cfda767725fe058da77c60d99/src/dp.jl#L297-L325' class='documenter-source'>source</a><br></p>
 <p><a id='DPMeansClustering.dp_centers' href='#DPMeansClustering.dp_centers'>#</a>
 <strong><code>DPMeansClustering.dp_centers</code></strong> &mdash; <em>Function</em>.</p>
 <pre><code>dp_centers(inputs, radius::Float64; distfunc = euclidean, center = mean, verbose = false, cycle_lim = 30)
@@ -334,14 +335,22 @@ centroids == [1, 4]
 <p>Cluster <code>input_vectors</code> using given distance and mean calculations, where a  vector with distance greater than <code>radius</code> from the nearest cluster forms a new cluster. Runs a maximum of <code>cycle_lim</code> iterations.</p>
 <p>Returns (centroid_vectors, cluster_sizes, cluster_indices, centroid_indices) where cluster_indices is an array of arrays of indices of <code>input_vectors</code> grouped by cluster, and centroid_indices is an array of values where each value indexes the vector in <code>input_vectors</code> closest to the respective centroid.</p>
 <p>This is a generalization of <code>dp_means</code>.</p>
-<p><a target='_blank' href='https://github.com/MurrellGroup/DPMeansClustering.jl/blob/c216c171c6de8d0a0d8db6dd197c02d996ab3aa2/src/dp.jl#L403-L416' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/MurrellGroup/DPMeansClustering.jl/blob/25d48980e173119cfda767725fe058da77c60d99/src/dp.jl#L403-L416' class='documenter-source'>source</a><br></p>
 <pre><code>dp_centers(inputs, radii::Vector{Float64}; distfunc = euclidean, center = mean, verbose = false, cycle_lim = [30...])
 </code></pre>
 
 <p>Cluster <code>input_vectors</code> using given distance and mean calculations recursively; <code>radii</code> should be an array of decreasing values, where each value is the radius of a successively finer clustering operation. During each clustering, a vector with distance greater than <code>radius</code> from the nearest cluster forms a new cluster. Runs a maximum of <code>cycle_lims</code> iterations during each cluster.</p>
 <p>Returns (centroid_vectors, cluster_sizes, cluster_indices, centroid_indices) where cluster_indices is an array of arrays of indices of <code>input_vectors</code> grouped by cluster, and centroid_indices is an array of values where each value indexes the vector in <code>input_vectors</code> closest to the respective centroid.</p>
 <p>This is a recursive implementation of <code>dp_centers(inputs, radius)</code> for faster clustering.</p>
-<p><a target='_blank' href='https://github.com/MurrellGroup/DPMeansClustering.jl/blob/c216c171c6de8d0a0d8db6dd197c02d996ab3aa2/src/dp.jl#L499-L513' class='documenter-source'>source</a><br></p>
+<p><a target='_blank' href='https://github.com/MurrellGroup/DPMeansClustering.jl/blob/25d48980e173119cfda767725fe058da77c60d99/src/dp.jl#L499-L513' class='documenter-source'>source</a><br></p>
+<p><a id='DPMeansClustering.cluster' href='#DPMeansClustering.cluster'>#</a>
+<strong><code>DPMeansClustering.cluster</code></strong> &mdash; <em>Function</em>.</p>
+<pre><code>cluster(inputs, radius::Float64; distfunc=euclidean, center=mean, verbose::Int64=1,
+            cycle_lim::Int64=30, triangle=false)
+</code></pre>
+
+<p>A wrapper that decides whether or not to use triangle inequality.</p>
+<p><a target='_blank' href='https://github.com/MurrellGroup/DPMeansClustering.jl/blob/25d48980e173119cfda767725fe058da77c60d99/src/dp.jl#L2-L8' class='documenter-source'>source</a><br></p>
                 
                   
                 
