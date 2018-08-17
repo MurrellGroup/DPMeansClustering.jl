@@ -29,3 +29,7 @@ Pkg.clone("https://github.com/MurrellGroup/DPMeansClustering.jl.git")
 ```julia
 using DPMeansClustering
 ```
+
+## Run Tests
+```julia
+Pkg.test("DPMeansClustering")
