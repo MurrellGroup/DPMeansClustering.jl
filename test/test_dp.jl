@@ -51,7 +51,7 @@ using Distances
         @test centroids == [1, 4]
     end
     
-    #recursive version of d_centers
+    #recursive version of dp_centers
     @testset "dp_centers" begin
         inputs = [[5, 0, 0, 1, 1, 5],
                   [5, 1, 0, 0, 1, 5],
