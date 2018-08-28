@@ -1,4 +1,6 @@
 
+[![Build Status](https://travis-ci.com/MurrellGroup/DPMeansClustering.jl.svg?branch=master)](https://travis-ci.com/MurrellGroup/DPMeansClustering.jl)
+
 <a id='DPMeansClustering-1'></a>
 
 # DPMeansClustering
