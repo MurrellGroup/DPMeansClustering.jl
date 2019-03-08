@@ -31,19 +31,24 @@ end
 Performs the first cycle of clustering in preparation for the creation of metacentroids
 """
 function get_initial_centroids(inputs, radius::Float64, input_length::Int64, distfunc, center, verbose::Int64)
+
     num_C = 1
     C_arr = [inputs[1]]
-    C_matrix = [falses(input_length)]
+    C_matrix = [falses( input_length)]
+    all_dists=[]
+
     for i in 1:length(inputs)
         curr_input = inputs[i]
         dists = [distfunc(C_arr[j], curr_input) for j in 1:num_C]
+        push!(all_dists, dists)
+
         if minimum(dists) > radius
             # Make a new cluster
             for k in 1:num_C #eliminate the input from its old cluster
                 C_matrix[k][i] = false
             end
             num_C += 1 #increment clusters
-            push!(C_matrix, falses(input_length)) #add to matrix
+            push!(C_matrix, falses( input_length)) #add to matrix
             C_matrix[num_C][i] = true #mark which input is in the new cluster
             push!(C_arr, curr_input)
         else
@@ -57,7 +62,7 @@ function get_initial_centroids(inputs, radius::Float64, input_length::Int64, dis
             end
         end
     end
-    C_arr = [center(inputs[findall(x->x==true,C_matrix[i])]) for i in 1:num_C]
+
     if verbose == 2
         println("cycle 1. n_clusters=$(num_C)")
     end
@@ -74,7 +79,7 @@ function get_initial_metacentroids(inputs, C_arr, MC_radius::Float64, distfunc, 
     changed = true
     num_C = length(C_arr)
     MC_arr = [C_arr[1]]
-    MC_matrix = [falses(num_C)]
+    MC_matrix = [falses( num_C)]
     C2MC_dist_matrix = Array{Array{Float64, 1}, 1}()
     changed = true
     for i in 1:num_C
@@ -85,7 +90,7 @@ function get_initial_metacentroids(inputs, C_arr, MC_radius::Float64, distfunc, 
                 MC_matrix[k][i] = false
             end
             num_MC += 1 #increment clusters
-            push!(MC_matrix, falses(num_C)) #add to matrix
+            push!(MC_matrix, falses( num_C)) #add to matrix
             MC_matrix[num_MC][i] = true #mark which input is in the new cluster
             push!(MC_arr, curr_C)
         else
@@ -99,9 +104,9 @@ function get_initial_metacentroids(inputs, C_arr, MC_radius::Float64, distfunc, 
             end
         end
     end
-    MC_arr = [center(C_arr[findall(x->x==true,MC_matrix[MC_index])]) for MC_index in 1:num_MC]
+    MC_arr = [center(C_arr[findall(MC_matrix[MC_index])]) for MC_index in 1:num_MC]
     for MC_index in 1:num_MC #get distances between centroids and metacentroids
-        C_indices = findall(x->x==true,MC_matrix[MC_index])
+        C_indices = findall(MC_matrix[MC_index])
         push!(C2MC_dist_matrix, [distfunc(MC_arr[MC_index], C_arr[index]) for index
                                in C_indices])
     end
@@ -137,10 +142,10 @@ function get_possible_centroids(MC_matrix, C_arr, R2MC_dist_arr::Array{Float64, 
 
     for MC in possible_metacentroids_indices #go through each predetermined MC
         R2MC_arr = R2MC_dist_arr[MC]
-        C_indices = findall(x->x==true,MC_matrix[MC]) #indices of centroids belonging to this MC
+        C_indices = findall(MC_matrix[MC]) #indices of centroids belonging to this MC
         C2MC_distances = C2MC_dist_matrix[MC] #distances between each centroid of this MC
         num_possible_C = length(C2MC_distances)
-        arr = abs.(C2MC_distances.-R2MC_arr) #minimum read to centroid distance
+        arr = abs.(C2MC_distances .- R2MC_arr) #minimum read to centroid distance
         for C_index in 1:num_possible_C # go through each C in this MC
             if(arr[C_index] <= radius) #the minimum read to centroid must be less than radius
                 push!(possible_centroids_indices, C_indices[C_index])
@@ -167,13 +172,13 @@ function C2MC_dp_centers(inputs, radius::Float64; distfunc=euclidean, center=mea
     num_C = length(C_arr)
 
     #2. Create initial metacentroids as well as C2MC distances
-    MC_arr, C2MC_dist_matrix, MC_matrix = get_initial_metacentroids(inputs,C_arr, MC_radius, distfunc,
+    MC_arr, C2MC_dist_matrix, MC_matrix::Array{Array, 1} = get_initial_metacentroids(inputs,C_arr, MC_radius, distfunc,
                                                                     center, verbose)
+
     num_MC = length(MC_arr)
     #3. Get a matrix of the distances between the reads and metacentroids
     R2MC_dist_matrix = [distfunc(MC_arr[MC_index], inputs[input_index]) for input_index in
                         1:input_length, MC_index in 1:num_MC]
-
     total_proportions = 0
     cycles = 1 #initial centroid cycle already complete
     changed = true
@@ -198,7 +203,7 @@ function C2MC_dp_centers(inputs, radius::Float64; distfunc=euclidean, center=mea
                     C_matrix[k][i] = false
                 end
                 num_C += 1 #increment clusters
-                push!(C_matrix, falses(input_length)) #add to matrix
+                push!(C_matrix, falses( input_length)) #add to matrix
                 C_matrix[num_C][i] = true #mark which input is in the new cluster
                 push!(C_arr, curr_input)
                 changed = true
@@ -208,24 +213,26 @@ function C2MC_dp_centers(inputs, radius::Float64; distfunc=euclidean, center=mea
                 minimum_distance = minimum(MC_distances)
                 #the new centroid can be added to an existing metacentroid
                 if minimum_distance <= MC_radius + radius
-                    #add C to MC_matrix
+                    #add new centroid to each MC
                     for i in 1:num_MC
-                        MC_matrix[i] = hcat(MC_matrix[i], false)
+                        push!(MC_matrix[i], false)
                     end
+
                     MC_matrix[min_MC_index][num_C] = true
                     push!(C2MC_dist_matrix[min_MC_index], minimum_distance)
                 else #the new centroid requires a new metacentroid
+                    #add new centroid to each MC
                     for i in 1:num_MC
-                        MC_matrix[i] = hcat(MC_matrix[i], false)
+                        push!(MC_matrix[i], false)
                     end
                     num_MC+=1
-
-                    push!(MC_matrix, falses(num_C))
+                    #add new metacentroid
+                    push!(MC_matrix, falses( num_C))
                     MC_matrix[num_MC][num_C] = true
                     push!(MC_arr, curr_input)
                     push!(C2MC_dist_matrix, [0.0])
                     new_dist_arr = [distfunc(inputs[j], curr_input) for j in 1:input_length]
-                    R2MC_dist_matrix = hcat(R2MC_dist_matrix, new_dist_arr)
+                    R2MC_dist_matrix=hcat(R2MC_dist_matrix, new_dist_arr)
                 end
             else
                 # Assign point to best cluster
@@ -234,6 +241,7 @@ function C2MC_dp_centers(inputs, radius::Float64; distfunc=euclidean, center=mea
                     for k in 1:num_C #eliminate the input from its old cluster
                         C_matrix[k][i] = false
                     end
+                    #push!(MC_matrix, falses( num_MC))
                     C_matrix[min_index][i] = true #mark which cluster the input was moved to
                     changed= true
                 end
@@ -241,14 +249,14 @@ function C2MC_dp_centers(inputs, radius::Float64; distfunc=euclidean, center=mea
         end
 
         #7. Update C's
-        C_arr = [center(inputs[findall(x->x==true,C_matrix[i])]) for i in 1:num_C]
+        C_arr = [center(inputs[findall(C_matrix[i])]) for i in 1:num_C]
 
         #8. Update C2MC. Exactly the same as getting initials.
         cycles+=1
 
         empty!(C2MC_dist_matrix)
         for MC_index in 1:num_MC #get distances between centroids and metacentroids
-            C_indices = findall(x->x==true,MC_matrix[MC_index])
+            C_indices = findall(MC_matrix[MC_index])
             push!(C2MC_dist_matrix, [distfunc(MC_arr[MC_index], C_arr[index]) for index
                                    in C_indices])
         end
@@ -265,7 +273,7 @@ function C2MC_dp_centers(inputs, radius::Float64; distfunc=euclidean, center=mea
         println("There are $(num_C) centroids and $(num_MC) metacentroids")
     end
 
-    cluster_indices = [findall(x->x==true,C_matrix[i]) for i in 1:num_C]
+    cluster_indices = [findall(C_matrix[i]) for i in 1:num_C]
     # Cleaning out the empty clusters. Maybe only run this if there
     # are length 0 elements in cluster_indices.
     sizes = zeros(Int, num_C)
@@ -297,7 +305,7 @@ end
 """
     dp_means(input_vectors::Array{Vector{Int}, 1}, radius::Float64; verbose = false)
 
-Cluster `input_vectors` using euclidean distance metric and arithmetic mean, where a 
+Cluster `input_vectors` using euclidean distance metric and arithmetic mean, where a
 vector with distance greater than `radius` from the nearest cluster forms a new cluster.
 
 Returns (centroid_vectors, cluster_sizes, cluster_indices, centroid_indices) where cluster_indices
@@ -403,7 +411,7 @@ end
 """
     dp_centers(inputs, radius::Float64; distfunc = euclidean, center = mean, verbose = false, cycle_lim = 30)
 
-Cluster `input_vectors` using given distance and mean calculations, where a 
+Cluster `input_vectors` using given distance and mean calculations, where a
 vector with distance greater than `radius` from the nearest cluster forms a new cluster.
 Runs a maximum of `cycle_lim` iterations.
 
@@ -417,7 +425,7 @@ This is a generalization of `dp_means`.
 function dp_centers(inputs, radius::Float64;
                     distfunc = euclidean,
                     center = mean,
-                    verbose = false, 
+                    verbose = false,
                     cycle_lims = 30)
 
     # ToDo:
@@ -514,19 +522,19 @@ This is a recursive implementation of `dp_centers(inputs, radius)` for faster cl
 function dp_centers(inputs, radii::Array{Float64};
                     distfunc = euclidean,
                     center = mean,
-                    verbose = false, 
+                    verbose = false,
                     cycle_lims = 20)#fill(30, length(radii)))
     cycle_lims = 20; #remove this later
-    μs, sizes, cluster_inds, centroid_inds = dp_centers(inputs, radii[1]; 
+    μs, sizes, cluster_inds, centroid_inds = dp_centers(inputs, radii[1];
                                                         distfunc=distfunc,
                                                         center=center,
-                                                        verbose=verbose, 
+                                                        verbose=verbose,
                                                         cycle_lims=cycle_lims)#cycle_lims[1])
     if length(radii) > 1
         newClustsZ = [collect(dp_centers(inputs[cluster_inds[i]], radii[2:end],
-                                                         distfunc=distfunc, 
-                                                         center=center, 
-                                                         verbose=verbose, 
+                                                         distfunc=distfunc,
+                                                         center=center,
+                                                         verbose=verbose,
                                                          cycle_lims=cycle_lims))#cycle_lims[2:end]))
                 for i in 1:length(cluster_inds)]
 
@@ -545,7 +553,7 @@ function dp_centers(inputs, radii::Array{Float64};
             # FIX: currently relies on dp_centers returning sorted lists of indices
             newClusts[4][i] = sort(vcat(newClusts[3][i]...))[newClusts[4][i]]
         end
-        
+
         # merge sub-clusters into a single array
         for i in 1:4
             newClusts[i] = vcat(newClusts[i]...)
@@ -555,5 +563,3 @@ function dp_centers(inputs, radii::Array{Float64};
         return μs, sizes, cluster_inds, centroid_inds
     end
 end
-
-
