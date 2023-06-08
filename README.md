@@ -1,8 +1,3 @@
-
-[![Build Status](https://travis-ci.com/MurrellGroup/DPMeansClustering.jl.svg?branch=master)](https://travis-ci.com/MurrellGroup/DPMeansClustering.jl)
-
-<a id='DPMeansClustering-1'></a>
-
 # DPMeansClustering
 
 - [`DPMeansClustering.cluster`]
@@ -19,19 +14,10 @@ https://murrellgroup.github.io/DPMeansClustering.jl/
 
 ## Synopsis
 
-Contains a variety of functions using dp based computation
+Like K-means, but instead of having to choose the number of clusters (which you usually don't know), you pick a cluster radius. Points falling outside the radius of any current clusters spawn new clusters.
 
 ## Installation
 ```julia
-Pkg.clone("https://github.com/MurrellGroup/DPMeansClustering.jl.git")
-
+using Pkg
+Pkg.add(url="https://github.com/MurrellGroup/DPMeansClustering.jl")
 ```
-
-## Set paths
-```julia
-using DPMeansClustering
-```
-
-## Run Tests
-```julia
-Pkg.test("DPMeansClustering")
